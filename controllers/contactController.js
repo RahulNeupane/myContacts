@@ -45,6 +45,10 @@ const updateContact =asyncHandlder( async (req, res) => {
         res.status(404)
         throw new Error("Contact not fouond")
     }
+    if(contact.user_id.toString() !== req.user.id){
+        res.status(403)
+        throw new Error("User don't have permission to update other user's contact list")
+    }
     const updatedContact = await Contact.findByIdAndUpdate(
         req.params.id,
         req.body,
@@ -52,7 +56,6 @@ const updateContact =asyncHandlder( async (req, res) => {
     )
     res.status(200).json(updatedContact)
 })
-
 //@description delete contacts
 //@route Delete /api/contacts/:id
 //@access private
@@ -62,7 +65,11 @@ const deleteContact = asyncHandlder(async (req, res) => {
         res.status(404)
         throw new Error("Contact not fouond")
     }
-    await contact.remove()
+    if(contact.user_id.toString()!== req.user.id){
+        res.status(403)
+        throw new Error("User dont have permission to delete other user's contact list item")
+    }
+    await Contact.deleteOne({_id: req.params.id})
     res.status(200).json(contact)
 })
 
