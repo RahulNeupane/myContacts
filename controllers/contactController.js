@@ -1,15 +1,16 @@
 const asyncHandlder = require("express-async-handler")
 const Contact = require("../models/contactModel")
+
 //@description Get all contacts
 //@route Get /api/contacts
-//@access public
+//@access private
 const getContacts =asyncHandlder( async (req, res) => {
-    const contacts = await Contact.find()
+    const contacts = await Contact.find({user_id: req.user.id})
     res.status(200).json(contacts)
 })
 //@description Create new contacts
 //@route Post /api/contacts
-//@access public
+//@access private
 const createContact = asyncHandlder( async (req, res) => {
     console.log("The request body is", req.body)
     const { name, email, phone } = req.body
@@ -18,14 +19,14 @@ const createContact = asyncHandlder( async (req, res) => {
         throw new Error('all fields are mandatory!')
     }
     const contact = await Contact.create({
-        name,email,phone
+        name,email,phone,user_id: req.user.id
     })
     res.status(201).json(contact)
 })
 
 //@description get contacts
 //@route Post /api/contacts/:id
-//@access public
+//@access private
 const getContact = asyncHandlder(async (req, res) => {
     const contact = await Contact.findById(req.params.id)
     if(!contact){
@@ -37,7 +38,7 @@ const getContact = asyncHandlder(async (req, res) => {
 
 //@description update contacts
 //@route Put /api/contacts/:id
-//@access public
+//@access private
 const updateContact =asyncHandlder( async (req, res) => {
     const contact = await Contact.findById(req.params.id)
     if(!contact){
@@ -54,7 +55,7 @@ const updateContact =asyncHandlder( async (req, res) => {
 
 //@description delete contacts
 //@route Delete /api/contacts/:id
-//@access public
+//@access private
 const deleteContact = asyncHandlder(async (req, res) => {
     const contact = await Contact.findById(req.params.id)
     if(!contact){
